@@ -44,6 +44,8 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
  * @author Rossen Stoyanchev
  * @author Spencer Gibb
  * @since 0.1
+ * FilteringWebHandler具体处理者
+ * WebHandler是处理抽象者，参数ServerWebExchange是处理对象
  */
 public class FilteringWebHandler implements WebHandler {
 
@@ -55,6 +57,12 @@ public class FilteringWebHandler implements WebHandler {
 		this.globalFilters = loadFilters(globalFilters);
 	}
 
+	/**
+	 * GatewayAutoConfiguration 的类FilteringWebHandler初始化代码块
+	 * 这个方法把上面这段代码收集了所有GlobalFilter其中包含框架默认提供的也包含我们自定义的, 进入到new方法可以看到在初始化的时候会根据order的值来进行排序
+	 * @param filters
+	 * @return
+	 */
 	private static List<GatewayFilter> loadFilters(List<GlobalFilter> filters) {
 		return filters.stream().map(filter -> {
 			GatewayFilterAdapter gatewayFilter = new GatewayFilterAdapter(filter);
@@ -76,6 +84,7 @@ public class FilteringWebHandler implements WebHandler {
 		Route route = exchange.getRequiredAttribute(GATEWAY_ROUTE_ATTR);
 		List<GatewayFilter> gatewayFilters = route.getFilters();
 
+		//添加自定义的filter到链上去
 		List<GatewayFilter> combined = new ArrayList<>(this.globalFilters);
 		combined.addAll(gatewayFilters);
 		// TODO: needed or cached?
@@ -84,7 +93,7 @@ public class FilteringWebHandler implements WebHandler {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Sorted gatewayFilterFactories: " + combined);
 		}
-
+        //处理调用链
 		return new DefaultGatewayFilterChain(combined).filter(exchange);
 	}
 
@@ -108,6 +117,11 @@ public class FilteringWebHandler implements WebHandler {
 			return filters;
 		}
 
+		/**
+		 * 核心方法，
+		 * @param exchange the current server exchange
+		 * @return
+		 */
 		@Override
 		public Mono<Void> filter(ServerWebExchange exchange) {
 			return Mono.defer(() -> {

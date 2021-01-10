@@ -19,6 +19,10 @@ package org.springframework.cloud.gateway.sample;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.gateway.discovery.DiscoveryClientRouteDefinitionLocator;
+import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +45,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
  */
 @SpringBootConfiguration
 @EnableAutoConfiguration
+@EnableEurekaClient
 @Import(AdditionalRoutes.class)
 public class GatewaySampleApplication {
 
@@ -171,6 +176,11 @@ public class GatewaySampleApplication {
 						.fromValue(HELLO_FROM_FAKE_ACTUATOR_METRICS_GATEWAY_REQUESTS)));
 		return route;
 	}
+
+//	@Bean
+//	public RouteDefinitionLocator discoveryClientRouteDefinitionLocator(DiscoveryClient discoveryClient) {
+//		return new DiscoveryClientRouteDefinitionLocator(discoveryClient);
+//	}
 
 	static class Hello {
 

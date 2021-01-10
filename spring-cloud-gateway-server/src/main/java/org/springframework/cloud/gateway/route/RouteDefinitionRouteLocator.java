@@ -80,6 +80,7 @@ public class RouteDefinitionRouteLocator
 			List<RoutePredicateFactory> predicates,
 			List<GatewayFilterFactory> gatewayFilterFactories,
 			GatewayProperties gatewayProperties, ConversionService conversionService) {
+		//路由配置信息赋值
 		this.routeDefinitionLocator = routeDefinitionLocator;
 		this.configurationService = new ConfigurationService();
 		this.configurationService.setConversionService(conversionService);

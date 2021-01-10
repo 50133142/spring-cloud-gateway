@@ -40,6 +40,9 @@ import org.springframework.web.reactive.DispatcherHandler;
 
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter(RedisReactiveAutoConfiguration.class)
+/**
+ * 说明 GatewayRedisAutoConfiguration 将会在{@link  GatewayAutoConfiguration} 之前加载
+ */
 @AutoConfigureBefore(GatewayAutoConfiguration.class)
 @ConditionalOnBean(ReactiveRedisTemplate.class)
 @ConditionalOnClass({ RedisTemplate.class, DispatcherHandler.class })

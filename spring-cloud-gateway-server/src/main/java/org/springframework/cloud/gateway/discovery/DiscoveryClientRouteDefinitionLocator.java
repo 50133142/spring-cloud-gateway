@@ -118,16 +118,19 @@ public class DiscoveryClientRouteDefinitionLocator implements RouteDefinitionLoc
 				return include;
 			};
 		}
-
+        //serviceInstances 注册发现客户端，用于向注册中心发起请求
 		return serviceInstances.filter(instances -> !instances.isEmpty())
 				.map(instances -> instances.get(0)).filter(includePredicate)
 				.map(instance -> {
+					//设置 ID
+					//设置 RouteDefinition.uri ，格式为 lb://${serviceId} 。在 LoadBalancerClientFilter 会根据 lb:// 前缀过滤处理，负载均衡，选择最终调用的服务地址
 					RouteDefinition routeDefinition = buildRouteDefinition(urlExpr,
 							instance);
 
 					final ServiceInstance instanceForEval = new DelegatingServiceInstance(
 							instance, properties);
 
+					// 添加 Path 匹配断言
 					for (PredicateDefinition original : this.properties.getPredicates()) {
 						PredicateDefinition predicate = new PredicateDefinition();
 						predicate.setName(original.getName());
@@ -137,9 +140,11 @@ public class DiscoveryClientRouteDefinitionLocator implements RouteDefinitionLoc
 									instanceForEval, entry);
 							predicate.addArg(entry.getKey(), value);
 						}
+						//例如服务的 serviceId = spring.application.name = juejin-sample ，通过网关 http://${gateway}/${serviceId}/some_api 访问服务 http://some_api
 						routeDefinition.getPredicates().add(predicate);
 					}
 
+					// 添加 Path 重写过滤器
 					for (FilterDefinition original : this.properties.getFilters()) {
 						FilterDefinition filter = new FilterDefinition();
 						filter.setName(original.getName());

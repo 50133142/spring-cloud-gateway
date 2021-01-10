@@ -6,31 +6,37 @@ test:
 
 
 spring:
+  application:
+    name: juejin-gateway
   jmx:
     enabled: false
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
       default-filters:
-      - PrefixPath=/httpbin
+#      - PrefixPath=/httpbin
       - AddResponseHeader=X-Response-Default-Foo, Default-Bar
-
       routes:
-      # =====================================
-      # to run server
-      # $ wscat --listen 9000
-      # to run client
-      # $ wscat --connect ws://localhost:8080/echo
-      - id: websocket_test
-        uri: ws://localhost:9000
-        order: 9000
-        predicates:
-        - Path=/echo
-      # =====================================
       - id: default_path_to_httpbin
         uri: ${test.uri}
         order: 10000
         predicates:
         - Path=/**
+      - id: order
+        uri:  lb://order-service
+        predicates:
+          - Path=/order/**
+#order-service:
+#  ribbon:
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRobinRule
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RetryRule
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.BestAvailableRule
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.AvailabilityFilteringRule
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.WeightedResponseTimeRule
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.ZoneAvoidanceRule
 
 logging:
   level:
@@ -41,3 +47,13 @@ logging:
     reactor.netty: DEBUG
 
 management.endpoints.web.exposure.include: '*'
+
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 10
+    leaseExpirationDurationInSeconds: 30
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+

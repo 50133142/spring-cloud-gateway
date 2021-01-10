@@ -133,6 +133,8 @@ public class AbstractGatewayControllerEndpoint implements ApplicationEventPublis
 
 		return Mono.just(route).filter(this::validateRouteDefinition)
 				.flatMap(routeDefinition -> this.routeDefinitionWriter
+						//save方法最后这个类InMemoryRouteDefinitionRepository保存到线程安全的map中
+						// Map<String, RouteDefinition> routes = synchronizedMap(new LinkedHashMap<String, RouteDefinition>());
 						.save(Mono.just(routeDefinition).map(r -> {
 							r.setId(id);
 							log.debug("Saving route: " + route);

@@ -19,6 +19,7 @@ package org.springframework.cloud.gateway.config;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.netflix.hystrix.HystrixObservableCommand;
 import io.netty.channel.ChannelOption;
@@ -170,8 +171,15 @@ import static org.springframework.cloud.gateway.config.HttpClientProperties.Pool
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "spring.cloud.gateway.enabled", matchIfMissing = true)
 @EnableConfigurationProperties
+/**
+ *
+ * GatewayAutoConfiguration在{@link HttpHandlerAutoConfiguration}  和{@link WebFluxAutoConfiguration 之前才会加载}
+ */
 @AutoConfigureBefore({ HttpHandlerAutoConfiguration.class,
 		WebFluxAutoConfiguration.class })
+/**
+ * GatewayAutoConfiguration在 {@link GatewayLoadBalancerClientAutoConfiguration} 和  {@link GatewayClassPathWarningAutoConfiguration}之后才会加载
+ */
 @AutoConfigureAfter({ GatewayLoadBalancerClientAutoConfiguration.class,
 		GatewayClassPathWarningAutoConfiguration.class })
 @ConditionalOnClass(DispatcherHandler.class)
@@ -222,6 +230,7 @@ public class GatewayAutoConfiguration {
 			List<RoutePredicateFactory> predicates,
 			RouteDefinitionLocator routeDefinitionLocator,
 			ConfigurationService configurationService) {
+		//routeDefinitionLocator 前面初始化的
 		return new RouteDefinitionRouteLocator(routeDefinitionLocator, predicates,
 				gatewayFilters, properties, configurationService);
 	}

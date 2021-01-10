@@ -76,6 +76,7 @@ public class CachingRouteLocator implements Ordered, RouteLocator,
 		return this.routes;
 	}
 
+	//AbstractGatewayControllerEndpoint 的方法refresh发布事件，   onApplicationEvent监听到该事件，刷新缓存
 	@Override
 	public void onApplicationEvent(RefreshRoutesEvent event) {
 		try {
